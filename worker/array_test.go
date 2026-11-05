@@ -18,6 +18,9 @@ func loadArrayReport(t *testing.T, dir string) map[string]json.RawMessage {
 	}
 	data := make(map[string]json.RawMessage)
 	for _, f := range files {
+		if filepath.Base(f) == "README" {
+			continue
+		}
 		b, err := os.ReadFile(f)
 		if err != nil {
 			t.Fatal(err)

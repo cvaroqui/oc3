@@ -7,8 +7,9 @@ package feeder
 // A type the collector does not parse yet is absent: its reports are
 // refused, rather than stored for nothing.
 var ArrayRequiredSections = map[ArrayType][]string{
-	Hds:     {"array", "lu", "port", "pool"},
-	Hp3par:  {"showvv", "showcpg", "showsys", "shownode", "showport", "showversion"},
-	Pure:    {"arrays", "volumes", "ports"},
-	Xtremio: {"clusters_details", "volumes_details", "targets_details"},
+	Hds:       {"array", "lu", "port", "pool"},
+	Hp3par:    {"showvv", "showcpg", "showsys", "shownode", "showport", "showversion"},
+	Pure:      {"arrays", "volumes", "ports"},
+	Symmetrix: {"sym_info", "sym_dir_info", "sym_dev_info", "sym_dev_wwn_info"},
+	Xtremio:   {"clusters_details", "volumes_details", "targets_details"},
 }

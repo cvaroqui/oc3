@@ -60,10 +60,11 @@ type (
 // arrayParsers are the parsers by array type. A type absent has its reports
 // refused by the feeder: see feeder.ArrayRequiredSections.
 var arrayParsers = map[feeder.ArrayType]arrayParser{
-	feeder.Hds:     parseHds,
-	feeder.Hp3par:  parseHp3par,
-	feeder.Pure:    parsePure,
-	feeder.Xtremio: parseXtremio,
+	feeder.Hds:       parseHds,
+	feeder.Hp3par:    parseHp3par,
+	feeder.Pure:      parsePure,
+	feeder.Symmetrix: parseSymmetrix,
+	feeder.Xtremio:   parseXtremio,
 }
 
 // arraySection decodes the section of a report into v.
