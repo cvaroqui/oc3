@@ -50,6 +50,7 @@ type (
 // arrayParsers are the parsers by array type. A type absent has its reports
 // refused by the feeder: see feeder.ArrayRequiredSections.
 var arrayParsers = map[feeder.ArrayType]arrayParser{
+	feeder.Hp3par:  parseHp3par,
 	feeder.Pure:    parsePure,
 	feeder.Xtremio: parseXtremio,
 }
