@@ -23,6 +23,12 @@ type (
 		DGs    []arrayDG
 		TgtIDs []string
 		Disks  []arrayDisk
+
+		// SvcdiskPrefix, when set, has the job rewrite the id of the
+		// disks the nodes see, as an hds array: the svcdisks whose id
+		// starts with it are indexed by their ldev, and a disk of the
+		// same Ldev takes the id the nodes know it by.
+		SvcdiskPrefix string
 	}
 
 	arrayDG struct {
@@ -40,6 +46,10 @@ type (
 		Alloc int64
 		Raid  string
 		Group string
+
+		// Ldev is the ldev of a disk of an hds array, lowercase hex: see
+		// SvcdiskPrefix.
+		Ldev string
 	}
 
 	// arrayParser makes the rows of the array name from the sections of its
@@ -50,6 +60,7 @@ type (
 // arrayParsers are the parsers by array type. A type absent has its reports
 // refused by the feeder: see feeder.ArrayRequiredSections.
 var arrayParsers = map[feeder.ArrayType]arrayParser{
+	feeder.Hds:     parseHds,
 	feeder.Hp3par:  parseHp3par,
 	feeder.Pure:    parsePure,
 	feeder.Xtremio: parseXtremio,

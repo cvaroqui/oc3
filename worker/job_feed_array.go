@@ -242,6 +242,9 @@ func (d *jobFeedArray) updateDB(ctx context.Context) error {
 		return err
 	}
 
+	if err := d.svcdiskIDs(ctx); err != nil {
+		return err
+	}
 	rows = make([]any, 0, len(r.Disks))
 	for _, disk := range r.Disks {
 		rows = append(rows, map[string]any{
@@ -291,5 +294,33 @@ func (d *jobFeedArray) cleanOrphans(ctx context.Context) error {
 			d.oDb.SetChange(c.table)
 		}
 	}
+	return nil
+}
+
+// svcdiskIDs gives the disks of an hds array the id the nodes see them by,
+// as the old collector did in insert_hds: the disks the nodes report under
+// the prefix of the array are indexed by their ldev, the end of their id.
+func (d *jobFeedArray) svcdiskIDs(ctx context.Context) error {
+	r := d.rows
+	if r.SvcdiskPrefix == "" {
+		return nil
+	}
+	rows, err := d.db.QueryContext(ctx, "SELECT DISTINCT disk_id FROM svcdisks WHERE disk_id LIKE ?", r.SvcdiskPrefix+"%")
+	if err != nil {
+		return fmt.Errorf("read the svcdisks of the array %s: %w", r.Name, err)
+	}
+	defer func() { _ = rows.Close() }()
+	ids := make([]string, 0)
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			return fmt.Errorf("read the svcdisks of the array %s: %w", r.Name, err)
+		}
+		ids = append(ids, id)
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("read the svcdisks of the array %s: %w", r.Name, err)
+	}
+	r.setSvcdiskIDs(ids)
 	return nil
 }
