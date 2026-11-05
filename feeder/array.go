@@ -7,5 +7,6 @@ package feeder
 // A type the collector does not parse yet is absent: its reports are
 // refused, rather than stored for nothing.
 var ArrayRequiredSections = map[ArrayType][]string{
-	Pure: {"arrays", "volumes", "ports"},
+	Pure:    {"arrays", "volumes", "ports"},
+	Xtremio: {"clusters_details", "volumes_details", "targets_details"},
 }

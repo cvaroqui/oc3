@@ -1,8 +1,10 @@
 package worker
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/opensvc/oc3/feeder"
 )
@@ -48,7 +50,8 @@ type (
 // arrayParsers are the parsers by array type. A type absent has its reports
 // refused by the feeder: see feeder.ArrayRequiredSections.
 var arrayParsers = map[feeder.ArrayType]arrayParser{
-	feeder.Pure: parsePure,
+	feeder.Pure:    parsePure,
+	feeder.Xtremio: parseXtremio,
 }
 
 // arraySection decodes the section of a report into v.
@@ -67,4 +70,22 @@ func arraySection(data map[string]json.RawMessage, section string, v any) error 
 // computed it.
 func mb(b int64) int64 {
 	return b / 1024 / 1024
+}
+
+// flexInt is an integer an array api sends as a json number or as a string,
+// the xtremio api for one.
+type flexInt int64
+
+func (t *flexInt) UnmarshalJSON(b []byte) error {
+	b = bytes.Trim(b, `"`)
+	if len(b) == 0 || string(b) == "null" {
+		*t = 0
+		return nil
+	}
+	i, err := strconv.ParseInt(string(b), 10, 64)
+	if err != nil {
+		return fmt.Errorf("not an integer: %s", b)
+	}
+	*t = flexInt(i)
+	return nil
 }
