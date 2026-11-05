@@ -1900,6 +1900,11 @@ paths:
         nodename and its previous uuid, else it registers itself. It moves to
         the app, the team responsible and the cluster of the enroller, and gets
         a new uuid, which the enroller hands to it.
+
+        A node already registered gets its uuid again when a user or the node
+        itself registers it. An anonymous registration, allowed by
+        server.allow_anon_register, of a node already registered is refused
+        with 409: the uuid is the password of the node.
       operationId: PostAuthNode
       requestBody:
         required: false

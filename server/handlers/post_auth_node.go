@@ -157,6 +157,12 @@ func (a *Api) PostAuthNode(c echo.Context) error {
 
 	switch len(authNodes) {
 	case 1:
+		if !mayResendNodeUUID(c) {
+			log.Info("anonymous registration of a node already registered refused", logkey.NodeID, nodeID)
+			a.nodeRegisterLog(c, ctx, log, "warning", "node %(node)s anonymous registration refused: already registered", nodeID,
+				map[string]any{"node": nodename})
+			return JSONProblemf(c, http.StatusConflict, "node %s is already registered: register it again with the credentials of a user", nodename)
+		}
 		// Already registered: resend uuid
 		// TODO: add metrics
 		log.Debug("node is already registered", logkey.NodeID, nodeID)
@@ -189,4 +195,12 @@ func (a *Api) PostAuthNode(c echo.Context) error {
 			map[string]any{"node": nodename})
 		return JSONProblem(c, http.StatusConflict, "node double registration attempt")
 	}
+}
+
+// mayResendNodeUUID tells if the caller may get the uuid of a node already
+// registered, which is the password of the node: a user responsible for its
+// app, or the node itself, but not an anonymous caller, who only knows the
+// nodename and the app of the node.
+func mayResendNodeUUID(c echo.Context) bool {
+	return !IsAuthByAnonRegister(c)
 }
